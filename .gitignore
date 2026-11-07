@@ -1,0 +1,25 @@
+# Environment & Secrets (keep plaintext out of Git; use .env.enc with git-crypt)
+.env
+
+# Local Voice Cache, Biometric WAV Recordings, and Synthesised Audio Outputs
+data/
+output/
+*.wav
+*.mp3
+*.m4a
+*.ogg
+
+# Loop receipts & local caches
+.cache/
+
+# Python / uv / Tooling
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/

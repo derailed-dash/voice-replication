@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "voice-replication"
+version = "0.1.0"
+description = "Personal Voice Replication & Expressive TTS Manager powered by Gemini 3.8 Flash TTS and Google Cloud Storage"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+authors = [{ name = "Darren 'Dazbo' Lester" }]
+dependencies = [
+    "google-genai>=2.30.1",
+    "google-cloud-storage>=3.0.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.7.0",
+    "pyyaml>=6.0.2",
+    "rich>=13.9.0",
+    "typer>=0.15.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "codespell>=2.4.1",
+    "pyright>=1.1.390",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.0",
+    "types-PyYAML>=6.0.12",
+]
+
+[project.scripts]
+voice-rep = "voice_replication.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/voice_replication"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-q --strict-markers"
+markers = [
+    "live: marks tests that call live Gemini or Google Cloud APIs (deselect with '-m \"not live\"')",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.pyright]
+pythonVersion = "3.13"
+include = ["src", "tests"]
+typeCheckingMode = "standard"
+
+[tool.codespell]
+skip = ".git,.venv,uv.lock,data,output,.cache"
+ignore-words-list = "nd,te"
