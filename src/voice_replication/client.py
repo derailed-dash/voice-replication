@@ -95,15 +95,17 @@ class VoiceReplicationClient:
         self,
         *,
         api_key: str | None = None,
+        api_version: str = "v1beta",
         client: Any | None = None,
     ) -> None:
         self.client: Any
+        http_options: Any = {"api_version": api_version}
         if client is not None:
             self.client = client
         elif api_key:
-            self.client = genai.Client(api_key=api_key)
+            self.client = genai.Client(api_key=api_key, http_options=http_options)
         else:
-            self.client = genai.Client()
+            self.client = genai.Client(http_options=http_options)
 
     def create_replicated_voice(
         self,

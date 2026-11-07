@@ -106,6 +106,18 @@ class _FakeGenAIClient:
 class TestVoiceReplicationClientCRUD:
     """Verify stateful/stateless voice replication, Voice Design, and remote CRUD."""
 
+    def test_default_client_uses_v1beta_api_version(self, monkeypatch: Any) -> None:
+        captured_kwargs: dict[str, Any] = {}
+
+        def _fake_genai_client(**kwargs: Any) -> _FakeGenAIClient:
+            captured_kwargs.update(kwargs)
+            return _FakeGenAIClient()
+
+        monkeypatch.setattr("voice_replication.client.genai.Client", _fake_genai_client)
+        VoiceReplicationClient(api_key="test-key")
+        assert captured_kwargs["api_key"] == "test-key"
+        assert captured_kwargs["http_options"] == {"api_version": "v1beta"}
+
     def test_create_stateful_replicated_voice(
         self, sample_reference_wav: Path, sample_consent_wav: Path
     ) -> None:

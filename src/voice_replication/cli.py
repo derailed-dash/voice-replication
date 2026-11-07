@@ -661,7 +661,7 @@ def speak_cmd(
     """Synthesise single-speaker speech using a replicated or prebuilt voice."""
     settings = _load_settings()
     resolved_voice_input = voice or settings.default_voice_alias
-    resolved_output = output or (settings.output_dir / "speech.wav")
+    resolved_output = output or (settings.output_dir / "speech.mp3")
     if file is not None:
         if not file.exists():
             _abort_with_hint(
@@ -721,7 +721,11 @@ def speak_cmd(
         style=effective_style,
         model=effective_model,
     )
-    final_path = export_mp3(wav_target, resolved_output) if out_fmt == "mp3" else wav_target
+    if out_fmt == "mp3":
+        final_path = export_mp3(wav_target, resolved_output)
+        wav_target.unlink(missing_ok=True)
+    else:
+        final_path = wav_target
 
     if as_json:
         _emit_json({"output_path": str(final_path), "format": out_fmt, "voice": voice_token})
@@ -752,7 +756,7 @@ def dialogue_cmd(
 ) -> None:
     """Synthesise a multi-speaker dialogue from a YAML script."""
     settings = _load_settings()
-    resolved_output = output or (settings.output_dir / "dialogue.wav")
+    resolved_output = output or (settings.output_dir / "dialogue.mp3")
     if not script_path.exists():
         _abort_with_hint(
             f"Dialogue YAML file not found: {script_path}",
@@ -783,7 +787,11 @@ def dialogue_cmd(
     vr_client = VoiceReplicationClient(api_key=settings.gemini_api_key or None)
     wav_target = resolved_output if out_fmt == "wav" else resolved_output.with_suffix(".wav")
     vr_client.synthesise_dialogue(script=script, output_wav_path=wav_target, catalogue=cat)
-    final_path = export_mp3(wav_target, resolved_output) if out_fmt == "mp3" else wav_target
+    if out_fmt == "mp3":
+        final_path = export_mp3(wav_target, resolved_output)
+        wav_target.unlink(missing_ok=True)
+    else:
+        final_path = wav_target
 
     if as_json:
         _emit_json({"output_path": str(final_path), "format": out_fmt})

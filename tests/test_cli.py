@@ -325,7 +325,8 @@ class TestCliCommands:
         res_ref = runner.invoke(app, ["refresh", "dazbo"])
         assert res_ref.exit_code == 0
 
-        # 5. speak --file & dialogue (live stub)
+        # 5. speak --file & dialogue (live stub, MP3 output removes intermediate .wav)
+        mp3_speak = tmp_path / "monologue.mp3"
         res_speak = runner.invoke(
             app,
             [
@@ -335,21 +336,26 @@ class TestCliCommands:
                 "--voice",
                 "dazbo",
                 "--output",
-                str(tmp_path / "monologue.wav"),
+                str(mp3_speak),
             ],
         )
         assert res_speak.exit_code == 0
+        assert mp3_speak.exists()
+        assert not mp3_speak.with_suffix(".wav").exists()
 
+        mp3_diag = tmp_path / "diag.mp3"
         res_diag = runner.invoke(
             app,
             [
                 "dialogue",
                 "examples/dialogue.yaml",
                 "--output",
-                str(tmp_path / "diag.wav"),
+                str(mp3_diag),
             ],
         )
         assert res_diag.exit_code == 0
+        assert mp3_diag.exists()
+        assert not mp3_diag.with_suffix(".wav").exists()
 
         # 6. gcs-preflight human, gcs-init, sync both
         assert runner.invoke(app, ["gcs-preflight"]).exit_code == 0

@@ -8,8 +8,9 @@ GCS backup bucket, and Gemini 3.8 TTS models.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,6 +22,15 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def _strip_surrounding_quotes(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            stripped = value.strip()
+            if len(stripped) >= 2 and stripped[0] == stripped[-1] and stripped[0] in {'"', "'"}:
+                return stripped[1:-1]
+        return value
 
     gemini_api_key: str = Field(
         default="",

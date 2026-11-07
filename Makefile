@@ -8,6 +8,7 @@ SHELL := /bin/bash
 # Strip optional surrounding double/single quotes from .env values
 unquote = $(patsubst "%",%,$(patsubst '%',%,$(1)))
 
+GEMINI_API_KEY            := $(call unquote,$(GEMINI_API_KEY))
 GCP_PROJECT_ID            := $(call unquote,$(GCP_PROJECT_ID))
 GCS_BUCKET_NAME           := $(call unquote,$(GCS_BUCKET_NAME))
 GCS_LOCATION              := $(call unquote,$(GCS_LOCATION))
@@ -20,23 +21,24 @@ DATA_DIR                  := $(call unquote,$(DATA_DIR))
 OUTPUT_DIR                := $(call unquote,$(OUTPUT_DIR))
 
 # Configurable CLI variables (defaulting to .env values; override on command line, e.g. `make speak ALIAS=custom`)
-ALIAS        ?= $(DEFAULT_VOICE_ALIAS)
-DISPLAY_NAME ?=
-SOURCE       ?=
-CONSENT      ?=
-LANGUAGE     ?= en-GB
-STYLE        ?= warm and conversational
-GENDER       ?= female
-TRIM_START   ?=
-TRIM_END     ?=
-FILE         ?= examples/monologue.md
-TEXT         ?=
-SCRIPT       ?= examples/dialogue.yaml
-OUT          ?= $(OUTPUT_DIR)/speech.mp3
-PREVIEW      ?=
-PROMPT       ?= A warm, articulate British podcast co-host with a friendly conversational tone.
-MODEL        ?= $(DEFAULT_TTS_MODEL)
-FLAGS        ?=
+# Lowercase command-line overrides (e.g. `source=... consent=...`) are also accepted as fallbacks.
+ALIAS        ?= $(or $(alias),$(DEFAULT_VOICE_ALIAS))
+DISPLAY_NAME ?= $(display_name)
+SOURCE       ?= $(source)
+CONSENT      ?= $(consent)
+LANGUAGE     ?= $(or $(language),en-GB)
+STYLE        ?= $(or $(style),warm and conversational)
+GENDER       ?= $(or $(gender),female)
+TRIM_START   ?= $(trim_start)
+TRIM_END     ?= $(trim_end)
+FILE         ?= $(or $(file),examples/monologue.md)
+TEXT         ?= $(text)
+SCRIPT       ?= $(or $(script),examples/dialogue.yaml)
+OUT          ?= $(or $(out),$(OUTPUT_DIR)/speech.mp3)
+PREVIEW      ?= $(preview)
+PROMPT       ?= $(or $(prompt),A warm, articulate British podcast co-host with a friendly conversational tone.)
+MODEL        ?= $(or $(model),$(DEFAULT_TTS_MODEL))
+FLAGS        ?= $(flags)
 
 .PHONY: help install lint fix test test-live check clean \
         prep-audio create create-stateless design list list-remote inspect refresh delete delete-remote \

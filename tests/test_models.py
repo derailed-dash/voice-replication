@@ -40,6 +40,13 @@ class TestSettings:
         assert settings.catalogue_path == tmp_path / "data" / "voices.json"
         assert settings.audio_dir_for_alias("dazbo") == tmp_path / "data" / "audio" / "dazbo"
 
+    def test_strips_surrounding_quotes_from_env_vars(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", '"AQ.quoted-key-value"')
+        monkeypatch.setenv("GCP_PROJECT_ID", "'quoted-project'")
+        settings = Settings(_env_file=None)  # type: ignore[call-arg]
+        assert settings.gemini_api_key == "AQ.quoted-key-value"
+        assert settings.gcp_project_id == "quoted-project"
+
 
 class TestAudioStats:
     """Verify audio format and duration validation properties."""
