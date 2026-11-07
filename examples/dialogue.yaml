@@ -1,0 +1,14 @@
+model: gemini-3.8-flash-tts
+speakers:
+  Dazbo: dazbo
+  CoHost: Kore
+turns:
+  - speaker: Dazbo
+    text: "Welcome to the show! Today we're testing personal voice replication with Gemini 3.8 Flash TTS."
+    style: "warm, enthusiastic British technical presenter"
+  - speaker: CoHost
+    text: "Thanks Dazbo! And because my voice is paired in the same interaction, we can record a complete two-host walkthrough from a single YAML script."
+    style: "bright, inquisitive studio co-host"
+  - speaker: Dazbo
+    text: "Spot on. Let's take a look at how the Coldline storage backup works."
+    style: "conversational and assured"

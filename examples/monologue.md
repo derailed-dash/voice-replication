@@ -1,0 +1,1 @@
+Welcome back to another deep dive into agentic engineering on Google Cloud. [pause] Today we're exploring how Gemini 3.8 Flash TTS replicates a personal speaker profile from a twenty-second reference clip, while keeping master recordings safely archived in a Coldline Cloud Storage bucket.
