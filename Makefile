@@ -67,7 +67,7 @@ fix: ## Auto-fix formatting and lint issues via ruff and check spelling
 	uv run ruff check --fix .
 	uv run codespell -s
 
-test: ## Run offline unit test suite with pytest and coverage (>=85% gate)
+test: ## Run offline unit test suite with pytest and coverage
 	uv run pytest -m "not live" --cov=voice_replication --cov-report=term-missing
 
 test-live: ## Run live Gemini API / GCS integration tests (requires GEMINI_API_KEY in .env)
@@ -84,7 +84,7 @@ clean: ## Remove build, test, and ruff/pyright cache directories
 
 ##@ Audio Pre-Flight & Voice Lifecycle
 
-prep-audio: ## Normalise reference & consent clips to 24kHz mono WAV and verify consent (requires SOURCE=... CONSENT=...)
+prep-audio: ## Normalise reference & consent clips to 24kHz mono WAV and verify consent
 	@if [ -z "$(SOURCE)" ] || [ -z "$(CONSENT)" ]; then \
 		echo "Error: SOURCE and CONSENT paths are required. Example: make prep-audio SOURCE=raw/ref.m4a CONSENT=raw/consent.m4a ALIAS=$(ALIAS)" >&2; \
 		exit 1; \
@@ -96,7 +96,7 @@ prep-audio: ## Normalise reference & consent clips to 24kHz mono WAV and verify 
 		$(if $(TRIM_END),--trim-end $(TRIM_END),) \
 		--verify-consent $(FLAGS)
 
-create: ## Create a stateful replicated voice (store=True, 1-year TTL) in Gemini API
+create: ## Create a stateful replicated voice (store=True, 1-year TTL)
 	uv run voice-rep create \
 		--alias "$(ALIAS)" \
 		$(if $(DISPLAY_NAME),--display-name "$(DISPLAY_NAME)",) \
@@ -118,7 +118,7 @@ create-stateless: ## Create a stateless replicated voice_key (store=False, 7-day
 		$(if $(MODEL),--model "$(MODEL)",) \
 		--stateless $(FLAGS)
 
-design: ## Create a prompted Voice Design co-host persona (override ALIAS, DISPLAY_NAME, PROMPT, GENDER)
+design: ## Create a custom synthetic voice from a text prompt
 	uv run voice-rep design \
 		--alias "$(ALIAS)" \
 		--display-name "$(or $(DISPLAY_NAME),$(ALIAS) Co-Host)" \
@@ -129,7 +129,7 @@ design: ## Create a prompted Voice Design co-host persona (override ALIAS, DISPL
 		$(if $(PREVIEW),--preview "$(PREVIEW)",) \
 		$(FLAGS)
 
-list: ## List all voices tracked in the local catalogue ($(DATA_DIR)/voices.json)
+list: ## List all voices tracked in the local catalogue (data/voices.json)
 	uv run voice-rep list $(FLAGS)
 
 list-remote: ## List voices in both the local catalogue and live remote Gemini API
@@ -138,18 +138,18 @@ list-remote: ## List voices in both the local catalogue and live remote Gemini A
 inspect: ## Inspect metadata, TTL countdown, and audio paths for ALIAS
 	uv run voice-rep inspect "$(ALIAS)" $(FLAGS)
 
-refresh: ## Re-create ALIAS from cached/GCS master WAVs to renew its 1-year TTL
+refresh: ## Renew a voice's 1-year TTL from master WAVs
 	uv run voice-rep refresh "$(ALIAS)" $(FLAGS)
 
-delete: ## Remove ALIAS from the local catalogue (pass FLAGS="--dry-run" to preview)
+delete: ## Delete a voice from the local catalogue
 	uv run voice-rep delete "$(ALIAS)" $(FLAGS)
 
-delete-remote: ## Remove ALIAS from both remote Gemini API and local catalogue
+delete-remote: ## Delete a voice from both remote Gemini API and local catalogue
 	uv run voice-rep delete "$(ALIAS)" --remote $(FLAGS)
 
 ##@ Speech & Dialogue Synthesis
 
-speak: ## Synthesise single-speaker audio (uses FILE=examples/monologue.md or TEXT="..." -> OUT)
+speak: ## Synthesise single-speaker audio (FILE=examples/monologue.md or TEXT="...")
 	@mkdir -p "$$(dirname "$(OUT)")"
 	uv run voice-rep speak \
 		$(if $(TEXT),"$(TEXT)",--file "$(FILE)") \
@@ -158,24 +158,24 @@ speak: ## Synthesise single-speaker audio (uses FILE=examples/monologue.md or TE
 		$(if $(MODEL),--model "$(MODEL)",) \
 		--output "$(OUT)" $(FLAGS)
 
-dialogue: ## Synthesise multi-speaker dialogue from YAML script (SCRIPT=examples/dialogue.yaml -> OUT)
+dialogue: ## Synthesise multi-speaker dialogue from YAML (SCRIPT=examples/dialogue.yaml)
 	@mkdir -p "$$(dirname "$(OUT)")"
 	uv run voice-rep dialogue "$(SCRIPT)" \
 		--output "$(OUT)" $(FLAGS)
 
 ##@ Google Cloud Storage (GCS) Backup & Recovery
 
-gcs-preflight: ## Display read-only gcloud pre-flight verification commands for GCP_PROJECT_ID from .env
+gcs-preflight: ## Display read-only gcloud pre-flight verification commands
 	uv run voice-rep gcs-preflight $(FLAGS)
 
-gcs-init: ## Provision regional GCS backup bucket (GCS_BUCKET_NAME, GCS_LOCATION, GCS_DEFAULT_STORAGE_CLASS from .env)
+gcs-init: ## Provision regional GCS backup bucket
 	uv run voice-rep gcs-init $(FLAGS)
 
-sync-push: ## Push local voices.json (STANDARD) and audio WAVs (COLDLINE) to GCS_BUCKET_NAME
+sync-push: ## Push local voices.json and audio WAVs to GCS
 	uv run voice-rep sync --direction push $(FLAGS)
 
-sync-pull: ## Pull voices.json and missing audio WAVs from GCS_BUCKET_NAME into DATA_DIR
+sync-pull: ## Pull voices.json and missing audio WAVs from GCS
 	uv run voice-rep sync --direction pull $(FLAGS)
 
-sync: ## Bi-directionally synchronise DATA_DIR and GCS_BUCKET_NAME (pull missing, then push local)
+sync: ## Bi-directionally synchronise local catalogue and audio WAVs with GCS
 	uv run voice-rep sync --direction both $(FLAGS)
