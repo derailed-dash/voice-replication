@@ -458,6 +458,19 @@ def list_cmd(
         )
     console.print(table)
 
+    if remote_list is not None:
+        remote_table = Table(title="Remote Gemini API Voices")
+        remote_table.add_column("Identifier", style="green", no_wrap=True)
+        remote_table.add_column("Display Name")
+        remote_table.add_column("Type", style="magenta")
+        for r_voice in remote_list:
+            remote_table.add_row(
+                str(r_voice.get("id", "")),
+                str(r_voice.get("display_name", "")),
+                str(r_voice.get("type", "")),
+            )
+        console.print(remote_table)
+
 
 @app.command("inspect")
 def inspect_cmd(

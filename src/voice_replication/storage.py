@@ -240,6 +240,7 @@ class GCSBackupManager:
 
                 local_target = alias_dir / kind
                 if not dry_run:
+                    local_target.parent.mkdir(parents=True, exist_ok=True)
                     wav_blob.download_to_filename(str(local_target))
                 setattr(record, attr_name, str(local_target))
                 downloaded.append(object_name)
