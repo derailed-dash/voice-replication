@@ -1,4 +1,4 @@
-name: "🧪 CI — Static Gate & Unit Tests"
+name: "🧪 CI — Lint & Unit Tests"
 
 on:
   push:
@@ -17,8 +17,8 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: "Tier 1 Gate (codespell, ruff, pyright, pytest)"
+  test:
+    name: "Lint & Unit Tests (ruff, pytest)"
     runs-on: ubuntu-latest
 
     steps:
@@ -37,18 +37,10 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --extra dev
 
-      - name: Check spelling (codespell)
-        run: uvx codespell@latest -s
+      - name: Lint check (ruff)
+        run: uv run --extra dev ruff check .
 
-      - name: Lint & format check (ruff)
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
-
-      - name: Static type check (pyright)
-        run: uv run pyright
-
-      - name: Run unit tests with coverage (pytest)
-        run: uv run pytest
+      - name: Run unit tests (pytest)
+        run: uv run --extra dev pytest

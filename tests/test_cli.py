@@ -200,7 +200,6 @@ class TestCliCommands:
         init_data = json.loads(init_res.stdout)
         assert init_data["dry_run"] is True
 
-
     def test_create_design_speak_dialogue_and_sync_full_paths(
         self,
         tmp_path: Path,
