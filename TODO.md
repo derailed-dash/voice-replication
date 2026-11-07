@@ -79,3 +79,14 @@
     - Stateless `research` subagent audits codebase against binary `PASS`/`FAIL` criteria from [SPEC.md](SPEC.md).
     - Record final run receipt in `.cache/loops/last_receipt.md` and output Loopy receipt.
   - **Verify**: 100% of Tier 1 and Tier 2 checks pass.
+
+## Phase 4: Live Voice Replication, Multi-Speaker Dialogue & Documentation Synchronisation
+
+- [x] **Task 9: Multi-Speaker Scenarios, Collaborator Sharing & Documentation Synchronisation** (2026-11-07)
+  - **Acceptance**:
+    - Default `speak` and `dialogue` outputs to `.mp3` (`output/speech.mp3`, `output/dialogue.mp3`) and automatically remove temporary `.wav` files after MP3 encoding.
+    - Organise raw recordings in `data/raw/` and personal YAML dialogue scripts in `data/scripts/` (git-ignored under `data/`).
+    - Update [README.md](README.md) with step-by-step `make` CLI vs Google AI Studio instructions for single-speaker replication, multi-speaker replication (`dazbo` + `kate`), single-speaker TTS, multi-speaker dialogue synthesis, and collaborator project sharing.
+    - Update [deployment/README.md](deployment/README.md) with full GCP project creation, all 3 required API enablements (`generativelanguage.googleapis.com`, `storage.googleapis.com`, `apikeys.googleapis.com`), IAM collaborator sharing for Google AI Studio, and shared `git-crypt` key usage (`~/localdev/git-crypt-key`).
+  - **Verify**: `uv run codespell -s` and structural markdown validation.
+  - **Files**: `README.md`, `deployment/README.md`, `TODO.md`
